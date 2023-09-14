@@ -59,16 +59,6 @@ int RandInRange(int low, int high) {
 // *** Code To Complete ***
 
 LLData *findBiggest(LLData *curr) {
-// findBiggest should return a pointer to the node with the biggest integer value in the list starting at curr
-// So if curr points to 5 -> 3 -> 2 -> 5 -> 4 -> 5 -> 3 -> 1 the function should return a pointer to one of the
-// nodes that has a 5 in it
-
-
-//IDEA: call function until end of linked list, storing pointer if value is bigger than value at current stored pointer
-//if end of linked list, return pointer
-}
-
-LLData *deleteAndCount(LLData *curr, int numToDelete, int& totalDeleted) {
 // deleteAndCount should return a list consisting only of the parts of the list starting at curr that does not
 // include nodes with data valued numToDelete, in addition, totalDeleted should be set to how many times that
 // that value was deleted
@@ -77,10 +67,56 @@ LLData *deleteAndCount(LLData *curr, int numToDelete, int& totalDeleted) {
 // and totalDeleted would be 3
 //
 
-//IDEA: call function until end of linked list, storing each data into new linked list unless numToDelete
-// if it is num to delete, then add to totalDeleted value.
-//if next is empty return, else call function again
+//if null pointer
+    if (curr == nullptr) {
+
+        return nullptr;
+    }
+
+    //recurssively calling function
+    LLData* nextBiggest = findBiggest(curr->getNext());
+
+    //conditional checking if data is bigger than the biggest item so far
+    //only starts running after last pointer is found
+    if (nextBiggest == nullptr || curr->getData() > nextBiggest->getData()) {
+        return curr;
+
+    } else {
+
+        return nextBiggest;
+
+    }
 }
+
+LLData *deleteAndCount(LLData *curr, int numToDelete, int& totalDeleted) {
+// findBiggest should return a pointer to the node with the biggest integer value in the list starting at curr
+// So if curr points to 5 -> 3 -> 2 -> 5 -> 4 -> 5 -> 3 -> 1 the function should return a pointer to one of the
+// nodes that has a 5 in it
+    
+    //checks if pointer is null, if at the end of the list pointer is null so it will return
+    if (curr == nullptr) {
+        return nullptr;
+    }
+
+    //recurssively calls function with next pointer
+    LLData* next = deleteAndCount(curr->getNext(), numToDelete, totalDeleted);
+
+
+    //as recursion returns values, this conditional checks if value should be deleted and updates based on that
+    if (curr->getData() == numToDelete) {
+
+        totalDeleted++;
+
+        return next;
+
+    } else {
+
+        curr->setNext(next);
+
+        return curr;
+    }
+}
+
 
 // *** Code To Complete ***
 
@@ -102,11 +138,26 @@ LinkedList sortList(LinkedList curr) {
 int main() {
     srand(time(0));
     LinkedList myList;
-    for (int i = 0; i < 500; i++) {
+    for (int i = 0; i < 50; i++) {
         myList.addItem(RandInRange(1,100));
     }
     myList.showList();
-    LinkedList newList = sortList(myList);
-    newList.showList();
+
+    //code to test functions
+
+    LLData* biggest = findBiggest(myList.getFirst());
+
+    int numToDelete = 51;
+    int numOfDeletes = 0;
+
+    myList.setFirst(deleteAndCount(myList.getFirst(), numToDelete, numOfDeletes));
+    cout << "List after deleting " << numToDelete << ": ";
+    myList.showList();
+    cout << "Total deletes: " << numOfDeletes << endl;
+
+    cout << "The biggest number is: " << biggest->getData() <<endl;
+
+
+
     return 0;
 }
